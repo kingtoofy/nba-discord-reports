@@ -3,7 +3,7 @@ name: NBA Daily Reports
 on:
   schedule:
     - cron: '0 16 * * *'  # 8 AM PST
-  workflow_dispatch:      # allows manual trigger
+  workflow_dispatch:
 
 jobs:
   nba-report:
@@ -11,11 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - run: pip install -r requirements.txt
-      - run: python -m playwright install
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-      - run: python -m src.main
+      - name: Install Playwright browsers
+        run: python -m playwright install
+
+      - name: Run daily NBA reports
+        run: python -m src.main
