@@ -5,7 +5,7 @@ from datetime import datetime, date
 import requests
 from src.fetch_injuries import get_injuries
 
-# balldontlie for schedule
+# balldontlie API for schedule
 BALLEDONTLIE_GAMES_URL = "https://api.balldontlie.io/v1/games"
 BALLEDONTLIE_API_KEY = os.getenv("BALLEDONTLIE_API_KEY")
 
