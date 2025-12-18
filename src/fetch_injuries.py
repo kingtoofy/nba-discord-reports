@@ -3,8 +3,8 @@ from bs4 import BeautifulSoup
 
 def get_injuries():
     """
-    Scrapes ESPN NBA injury page using Playwright.
-    Returns a dict: {team_name: [ {player, position, status, note} ]}
+    Scrapes ESPN NBA injury page (all teams on one page).
+    Returns a dictionary: {team_name: [ {player, position, status, note} ]}
     """
     injuries_by_team = {}
 
@@ -12,11 +12,12 @@ def get_injuries():
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
         page.goto("https://www.espn.com/nba/injuries")
-        page.wait_for_selector("h2")  # wait for team headers to load
+        page.wait_for_selector("h2")  # Wait until team headers load
 
         html = page.content()
         soup = BeautifulSoup(html, "html.parser")
 
+        # Each team header is <h2> followed by a <table>
         team_headers = soup.find_all("h2")
         for h2 in team_headers:
             team_name = h2.get_text(strip=True)
@@ -26,7 +27,9 @@ def get_injuries():
             if not table:
                 continue
 
-            for row in table.find_all("tr"):
+            # Parse table rows (skip header row)
+            rows = table.find_all("tr")[1:]
+            for row in rows:
                 cols = row.find_all("td")
                 if len(cols) < 4:
                     continue
