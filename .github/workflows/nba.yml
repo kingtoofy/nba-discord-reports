@@ -1,26 +1,17 @@
-name: NBA Daily Reports
-
+name: NBA Daily Discord Reports
 on:
   schedule:
-    - cron: '0 16 * * *'  # 8 AM PST
-  workflow_dispatch:
-
+    - cron: '0 16 * * *'  # 16:00 UTC = 8:00 AM PST
 jobs:
-  nba-report:
+  run:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-
+          python-version: "3.11"
       - name: Install dependencies
         run: pip install -r requirements.txt
-
-      - name: Install Playwright browsers
-        run: python -m playwright install
-
-      - name: Run daily NBA reports
+      - name: Run script
         run: python -m src.main
