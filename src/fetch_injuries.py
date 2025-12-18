@@ -41,3 +41,13 @@ def get_injuries():
             })
 
     return injuries_by_team
+
+# -------------------------
+# TEST FETCHER
+# -------------------------
+if __name__ == "__main__":
+    injuries = get_injuries()
+    for team, players in injuries.items():
+        print(f"{team}:")
+        for p in players:
+            print(f"  {p['player']} ({p['position']}) — {p['status']}")
