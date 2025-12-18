@@ -13,7 +13,7 @@ def get_injuries():
 
     injuries_by_team = {}
 
-    # Each team section is in a div with data-team attribute
+    # Each team section is in a div with class "Injury__Team"
     team_sections = soup.find_all("div", class_="Injury__Team")
     for team_div in team_sections:
         team_name_tag = team_div.find("h2")
@@ -28,4 +28,4 @@ def get_injuries():
             player_name_tag = p_div.find("span", class_="Injury__PlayerName")
             position_tag = p_div.find("span", class_="Injury__PlayerPosition")
             status_tag = p_div.find("span", class_="Injury__PlayerStatus")
-            note_tag = p_div.find("span", class_="Inj_
+            note_tag = p_div.find("s
