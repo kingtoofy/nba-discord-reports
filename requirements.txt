@@ -1,2 +1,4 @@
+requests
+beautifulsoup4
 nbainjuries
 tabula-py
