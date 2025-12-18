@@ -2,40 +2,6 @@ from datetime import date
 from src.fetch_schedule import get_todays_games
 from src.fetch_injuries import get_injuries
 
-# Complete mapping from NBA.com team names to ESPN injury names
-TEAM_NAME_MAP = {
-    "Atlanta Hawks": "Atlanta",
-    "Boston Celtics": "Boston Celtics",
-    "Brooklyn Nets": "Brooklyn",
-    "Charlotte Hornets": "Charlotte",
-    "Chicago Bulls": "Chicago",
-    "Cleveland Cavaliers": "Cleveland",
-    "Dallas Mavericks": "Dallas",
-    "Denver Nuggets": "Denver",
-    "Detroit Pistons": "Detroit",
-    "Golden State Warriors": "Golden State",
-    "Houston Rockets": "Houston",
-    "Indiana Pacers": "Indiana",
-    "Los Angeles Clippers": "LA Clippers",
-    "Los Angeles Lakers": "Los Angeles Lakers",
-    "Memphis Grizzlies": "Memphis",
-    "Miami Heat": "Miami",
-    "Milwaukee Bucks": "Milwaukee",
-    "Minnesota Timberwolves": "Minnesota",
-    "New Orleans Pelicans": "New Orleans",
-    "New York Knicks": "New York Knicks",
-    "Oklahoma City Thunder": "Oklahoma City",
-    "Orlando Magic": "Orlando",
-    "Philadelphia 76ers": "Philadelphia",
-    "Phoenix Suns": "Phoenix",
-    "Portland Trail Blazers": "Portland",
-    "Sacramento Kings": "Sacramento",
-    "San Antonio Spurs": "San Antonio",
-    "Toronto Raptors": "Toronto",
-    "Utah Jazz": "Utah",
-    "Washington Wizards": "Washington",
-}
-
 def picks_report():
     """
     Placeholder top 15 picks report.
@@ -67,6 +33,10 @@ def daily_report():
         report += "No games today.\n"
         return report
 
+    # Debug prints (optional)
+    # print("Games:", games)
+    # print("Injuries keys:", injuries.keys())
+
     for game in games:
         report += f"• {game}\n"
 
@@ -75,12 +45,13 @@ def daily_report():
         except ValueError:
             home, away = game, ""
 
+        # Match team names exactly as they appear in injuries dict
         for team in [away, home]:
-            espn_team = TEAM_NAME_MAP.get(team, team)
+            espn_team = team
             if espn_team in injuries and injuries[espn_team]:
                 report += f"  {team} Injuries:\n"
                 for p in injuries[espn_team]:
-                    report += f"    - {p['player']} ({p['position']}) — {p['status']}\n"
+                    report += f"    - {p['player']} ({p['position']}) — {p['status']} [{p['note']}]\n"
 
     return report
 
