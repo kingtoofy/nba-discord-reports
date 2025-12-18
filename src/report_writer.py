@@ -16,17 +16,20 @@ def get_schedule():
     try:
         response = requests.get(SCHEDULE_URL, timeout=10)
         soup = BeautifulSoup(response.text, "html.parser")
-        # Each row in the schedule table
-        game_rows = soup.select("table tbody tr")
-        for game in game_rows:
-            cells = game.find_all("td")
-            if len(cells) < 2:
-                continue
-            team1 = cells[0].get_text(strip=True)
-            team2 = cells[1].get_text(strip=True)
-            schedule.append(f"{team1} vs {team2}")
+
+        # Find the main table with today's games
+        schedule_table = soup.find("table", class_="Table")
+        if schedule_table:
+            rows = schedule_table.find_all("tr")[1:]  # skip header
+            for row in rows:
+                cells = row.find_all("td")
+                if len(cells) >= 2:
+                    team1 = cells[0].get_text(strip=True)
+                    team2 = cells[1].get_text(strip=True)
+                    schedule.append(f"{team1} vs {team2}")
     except Exception as e:
         schedule.append(f"Failed to fetch schedule: {e}")
+
     return schedule
 
 def daily_report():
