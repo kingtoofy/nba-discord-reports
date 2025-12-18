@@ -2,6 +2,17 @@ from datetime import date
 from src.fetch_schedule import get_todays_games
 from src.fetch_injuries import get_injuries
 
+# Mapping to match NBA.com team names to ESPN names (adjust as needed)
+TEAM_NAME_MAP = {
+    "Golden State Warriors": "Golden State",
+    "Los Angeles Lakers": "Los Angeles Lakers",
+    "Boston Celtics": "Boston Celtics",
+    "New York Knicks": "New York Knicks",
+    "Miami Heat": "Miami",
+    "Chicago Bulls": "Chicago",
+    # Add all NBA teams here for full mapping
+}
+
 def picks_report():
     """
     Placeholder picks report.
@@ -21,29 +32,31 @@ def picks_report():
 def daily_report():
     """
     Fetches today's NBA games and formats a daily report.
-    Includes injuries from ESPN. Stats and odds will be added later.
+    Includes injuries under each matchup.
     """
     today = date.today().strftime("%B %d, %Y")
     games = get_todays_games()
     injuries = get_injuries()
 
-    if not games:
-        return f"🏀 **NBA Daily Report — {today}**\n\nNo games today."
-
     report = f"🏀 **NBA Daily Report — {today}**\n\n"
+
+    if not games:
+        report += "No games today.\n"
+        return report
 
     for game in games:
         report += f"• {game}\n"
 
-        # Include injuries for both teams
         try:
             home, away = game.split(" @ ")
         except ValueError:
             home, away = game, ""
+
         for team in [away, home]:
-            if team in injuries and injuries[team]:
+            espn_team = TEAM_NAME_MAP.get(team, team)  # Map to ESPN name
+            if espn_team in injuries and injuries[espn_team]:
                 report += f"  {team} Injuries:\n"
-                for p in injuries[team]:
+                for p in injuries[espn_team]:
                     report += f"    - {p['player']} ({p['position']}) — {p['status']}\n"
 
     return report
