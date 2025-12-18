@@ -5,7 +5,7 @@ from src.fetch_injuries import get_injuries
 def picks_report():
     """
     Placeholder top 15 picks report.
-    Will be replaced later with real statistical picks.
+    Can be replaced later with real statistical picks.
     """
     today = date.today().strftime("%B %d, %Y")
     return f"""
@@ -33,10 +33,6 @@ def daily_report():
         report += "No games today.\n"
         return report
 
-    # Debug prints (optional)
-    # print("Games:", games)
-    # print("Injuries keys:", injuries.keys())
-
     for game in games:
         report += f"• {game}\n"
 
@@ -45,12 +41,11 @@ def daily_report():
         except ValueError:
             home, away = game, ""
 
-        # Match team names exactly as they appear in injuries dict
+        # Display injuries for each team if any
         for team in [away, home]:
-            espn_team = team
-            if espn_team in injuries and injuries[espn_team]:
+            if team in injuries and injuries[team]:
                 report += f"  {team} Injuries:\n"
-                for p in injuries[espn_team]:
+                for p in injuries[team]:
                     report += f"    - {p['player']} ({p['position']}) — {p['status']} [{p['note']}]\n"
 
     return report
