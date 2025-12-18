@@ -17,20 +17,27 @@ def get_schedule():
 
     try:
         response = requests.get(BALLEDONTLIE_GAMES_URL, params=params, timeout=10)
-        data = response.json().get("data", [])
+        response.raise_for_status()
+
+        try:
+            data = response.json().get("data", [])
+        except ValueError:
+            print("Response is not valid JSON:", response.text)
+            return ["Failed to fetch schedule: invalid JSON"]
+
         for g in data:
             home = g["home_team"]["full_name"]
             away = g["visitor_team"]["full_name"]
             schedule.append(f"{away} vs {home}")
-    except Exception as e:
+
+    except requests.RequestException as e:
         schedule.append(f"Failed to fetch schedule: {e}")
 
     return schedule
 
 def daily_report():
     """
-    Generate the full daily report for Discord.
-    Includes schedule + injury report.
+    Generate the daily report for Discord.
     """
     now = datetime.now()
     report = f"🏀 **NBA Daily Report** 🏀\n_Time: {now.strftime('%Y-%m-%d %H:%M:%S')}_\n\n"
@@ -45,7 +52,7 @@ def daily_report():
         report += " - No games scheduled today\n"
     report += "\n"
 
-    # Injuries
+    # Injuries (empty for now)
     injuries = get_injuries()
     report += "**Injury Report:**\n"
     if injuries:
@@ -60,12 +67,11 @@ def daily_report():
     else:
         report += "No injury data available today.\n"
 
-    # Truncate to avoid Discord 2000 character limit
     return report[:1900]
 
 def picks_report():
     """
-    Dummy top picks report — replace with your AI/analysis logic.
+    Placeholder top picks report.
     """
     now = datetime.now()
     report = f"🏀 **NBA Top Picks of the Day** 🏀\n_Time: {now.strftime('%Y-%m-%d %H:%M:%S')}_\n\n"
