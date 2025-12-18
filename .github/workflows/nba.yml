@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install deps
+      - name: Install dependencies
         run: pip install requests
 
       - name: Run bot
@@ -24,4 +24,5 @@ jobs:
           DISCORD_DAILY_WEBHOOK: ${{ secrets.DISCORD_DAILY_WEBHOOK }}
           DISCORD_PICKS_WEBHOOK: ${{ secrets.DISCORD_PICKS_WEBHOOK }}
           BALLEDONTLIE_API_KEY: ${{ secrets.BALLEDONTLIE_API_KEY }}
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
         run: python -m src.main
