@@ -1,38 +1,30 @@
 # src/fetch_injuries.py
 
-import os
 import requests
 
-RAPIDAPI_URL = "https://sports-information.p.rapidapi.com/nba/injuries"
-RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY")
+NBA_INJURIES_URL = "https://raw.githubusercontent.com/mxufc29/nbainjuries/main/data/injury-report.json"
 
 def get_injuries():
     """
-    Fetch NBA injuries from RapidAPI Sports Information.
-    Returns a dict of team -> list of injured players
+    Fetch NBA injuries from nbainjuries JSON.
+    Returns dict: team -> list of injured players
     """
-    headers = {
-        "X-RapidAPI-Key": RAPIDAPI_KEY,
-        "X-RapidAPI-Host": "sports-information.p.rapidapi.com"
-    }
-
     try:
-        response = requests.get(RAPIDAPI_URL, headers=headers, timeout=10)
+        response = requests.get(NBA_INJURIES_URL, timeout=10)
         response.raise_for_status()
         data = response.json()
 
         injuries = {}
-        for team in data.get("teams", []):
-            team_name = team.get("name")
-            players = team.get("players", [])
+        for team_entry in data.get("teams", []):
+            team_name = team_entry.get("team")
+            players = team_entry.get("players", [])
             injuries[team_name] = []
             for p in players:
                 injuries[team_name].append({
                     "player": p.get("name"),
                     "status": p.get("status"),
-                    "note": p.get("description", "")
+                    "note": p.get("injury", "")
                 })
-
         return injuries
 
     except requests.RequestException as e:
