@@ -1,3 +1,5 @@
+# src/main.py
+
 import os
 import requests
 from src.report_writer import daily_report, picks_report
@@ -7,7 +9,7 @@ PICKS_WEBHOOK = os.getenv("DISCORD_PICKS_WEBHOOK")
 
 def send(webhook, content):
     """
-    Send a message to a Discord webhook with basic error handling.
+    Send a message to a Discord webhook with error handling.
     """
     try:
         response = requests.post(webhook, json={"content": content}, timeout=10)
