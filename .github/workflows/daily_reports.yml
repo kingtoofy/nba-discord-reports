@@ -22,4 +22,4 @@ jobs:
         env:
           DISCORD_PICKS_WEBHOOK: ${{ secrets.DISCORD_PICKS_WEBHOOK }}
           DISCORD_REPORT_WEBHOOK: ${{ secrets.DISCORD_REPORT_WEBHOOK }}
-        run: python src/main.py
+        run: python -m src.main
