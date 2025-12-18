@@ -20,22 +20,9 @@ jobs:
         with:
           python-version: "3.11"
 
-      # Install Java for tabula-py / nbainjuries
-      - name: Install Java
-        run: sudo apt-get update && sudo apt-get install -y default-jdk
-
-      # Install Python dependencies
+      # Install dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt
-
-      # Debug environment variables
-      - name: Check webhook secrets
-        run: |
-          echo "Daily webhook: $DISCORD_DAILY_WEBHOOK"
-          echo "Picks webhook: $DISCORD_PICKS_WEBHOOK"
-        env:
-          DISCORD_DAILY_WEBHOOK: ${{ secrets.DISCORD_DAILY_WEBHOOK }}
-          DISCORD_PICKS_WEBHOOK: ${{ secrets.DISCORD_PICKS_WEBHOOK }}
 
       # Run main Python script
       - name: Run NBA Discord Reports
