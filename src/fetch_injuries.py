@@ -1,63 +1,47 @@
-from playwright.sync_api import sync_playwright
+import requests
 from bs4 import BeautifulSoup
 
+SPORTSETHOS_URL = "https://sportsethos.com/live-injury-report/"
+
 def get_injuries():
-    """
-    Scrapes ESPN NBA injury page (all teams on one page).
-    Returns a dictionary: {team_name: [ {player, position, status, note} ]}
-    """
-    injuries_by_team = {}
+    injuries = {}
+    response = requests.get(SPORTSETHOS_URL, timeout=10)
+    soup = BeautifulSoup(response.text, "html.parser")
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto("https://www.espn.com/nba/injuries")
-        page.wait_for_selector("h2")  # Wait until team headers load
+    # Each team section is a div with class 'injury-team' (check the page to confirm)
+    team_sections = soup.select("div.injury-team")
+    for team_div in team_sections:
+        team_name_tag = team_div.find("h3")
+        if not team_name_tag:
+            continue
+        team_name = team_name_tag.get_text(strip=True)
+        injuries[team_name] = []
 
-        html = page.content()
-        soup = BeautifulSoup(html, "html.parser")
-
-        # Each team header is <h2> followed by a <table>
-        team_headers = soup.find_all("h2")
-        for h2 in team_headers:
-            team_name = h2.get_text(strip=True)
-            injuries_by_team[team_name] = []
-
-            table = h2.find_next("table")
-            if not table:
+        # Each player in <li>
+        player_rows = team_div.select("li")
+        for row in player_rows:
+            text = row.get_text(" ", strip=True)
+            # Example: "Trae Young G Out Knee — questionable"
+            parts = text.split(" — ")
+            note = parts[1] if len(parts) > 1 else ""
+            player_status = parts[0].split()
+            if len(player_status) < 3:
                 continue
+            player_name = " ".join(player_status[:-2])
+            position = player_status[-2]
+            status = player_status[-1]
+            injuries[team_name].append({
+                "player": player_name,
+                "position": position,
+                "status": status,
+                "note": note
+            })
+    return injuries
 
-            # Parse table rows (skip header row)
-            rows = table.find_all("tr")[1:]
-            for row in rows:
-                cols = row.find_all("td")
-                if len(cols) < 4:
-                    continue
-
-                player_name = cols[0].get_text(strip=True)
-                position = cols[1].get_text(strip=True)
-                est_return = cols[2].get_text(strip=True)
-                status = cols[3].get_text(strip=True)
-                note = cols[4].get_text(strip=True) if len(cols) > 4 else ""
-
-                injuries_by_team[team_name].append({
-                    "player": player_name,
-                    "position": position,
-                    "status": status,
-                    "note": note
-                })
-
-        browser.close()
-
-    return injuries_by_team
-
-# -------------------------
-# TEST FETCHER
-# -------------------------
+# Test locally
 if __name__ == "__main__":
-    injuries = get_injuries()
-    for team, players in injuries.items():
-        if players:
-            print(f"{team}:")
-            for p in players:
-                print(f"  - {p['player']} ({p['position']}) — {p['status']} [{p['note']}]")
+    data = get_injuries()
+    for team, players in data.items():
+        print(team)
+        for p in players:
+            print(f" - {p['player']} ({p['position']}) — {p['status']}: {p['note']}")
