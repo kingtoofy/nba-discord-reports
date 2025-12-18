@@ -1,7 +1,8 @@
 name: NBA Daily Discord Reports
 on:
   schedule:
-    - cron: '0 16 * * *'  # 16:00 UTC = 8:00 AM PST
+    - cron: '0 16 * * *'  # 8:00 AM PST
+  workflow_dispatch:       # <-- allows manual runs
 jobs:
   run:
     runs-on: ubuntu-latest
