@@ -2,20 +2,43 @@ from datetime import date
 from src.fetch_schedule import get_todays_games
 from src.fetch_injuries import get_injuries
 
-# Mapping to match NBA.com team names to ESPN names (adjust as needed)
+# Complete mapping from NBA.com team names to ESPN injury names
 TEAM_NAME_MAP = {
-    "Golden State Warriors": "Golden State",
-    "Los Angeles Lakers": "Los Angeles Lakers",
+    "Atlanta Hawks": "Atlanta",
     "Boston Celtics": "Boston Celtics",
-    "New York Knicks": "New York Knicks",
-    "Miami Heat": "Miami",
+    "Brooklyn Nets": "Brooklyn",
+    "Charlotte Hornets": "Charlotte",
     "Chicago Bulls": "Chicago",
-    # Add all NBA teams here for full mapping
+    "Cleveland Cavaliers": "Cleveland",
+    "Dallas Mavericks": "Dallas",
+    "Denver Nuggets": "Denver",
+    "Detroit Pistons": "Detroit",
+    "Golden State Warriors": "Golden State",
+    "Houston Rockets": "Houston",
+    "Indiana Pacers": "Indiana",
+    "Los Angeles Clippers": "LA Clippers",
+    "Los Angeles Lakers": "Los Angeles Lakers",
+    "Memphis Grizzlies": "Memphis",
+    "Miami Heat": "Miami",
+    "Milwaukee Bucks": "Milwaukee",
+    "Minnesota Timberwolves": "Minnesota",
+    "New Orleans Pelicans": "New Orleans",
+    "New York Knicks": "New York Knicks",
+    "Oklahoma City Thunder": "Oklahoma City",
+    "Orlando Magic": "Orlando",
+    "Philadelphia 76ers": "Philadelphia",
+    "Phoenix Suns": "Phoenix",
+    "Portland Trail Blazers": "Portland",
+    "Sacramento Kings": "Sacramento",
+    "San Antonio Spurs": "San Antonio",
+    "Toronto Raptors": "Toronto",
+    "Utah Jazz": "Utah",
+    "Washington Wizards": "Washington",
 }
 
 def picks_report():
     """
-    Placeholder picks report.
+    Placeholder top 15 picks report.
     Will be replaced later with real statistical picks.
     """
     today = date.today().strftime("%B %d, %Y")
@@ -32,11 +55,11 @@ def picks_report():
 def daily_report():
     """
     Fetches today's NBA games and formats a daily report.
-    Includes injuries under each matchup.
+    Includes injuries for each team under the correct matchup.
     """
     today = date.today().strftime("%B %d, %Y")
     games = get_todays_games()
-    injuries = get_injuries()
+    injuries = get_injuries() or {}
 
     report = f"🏀 **NBA Daily Report — {today}**\n\n"
 
@@ -53,7 +76,7 @@ def daily_report():
             home, away = game, ""
 
         for team in [away, home]:
-            espn_team = TEAM_NAME_MAP.get(team, team)  # Map to ESPN name
+            espn_team = TEAM_NAME_MAP.get(team, team)
             if espn_team in injuries and injuries[espn_team]:
                 report += f"  {team} Injuries:\n"
                 for p in injuries[espn_team]:
@@ -62,7 +85,7 @@ def daily_report():
     return report
 
 # -------------------------
-# TEST DAILY REPORT
+# TEST REPORTS
 # -------------------------
 if __name__ == "__main__":
     print("=== PICKS REPORT ===")
