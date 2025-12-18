@@ -1,51 +1,58 @@
 # src/fetch_injuries.py
 
-import requests
-from bs4 import BeautifulSoup
-
-SPORTSETHOS_URL = "https://sportsethos.com/live-injury-report/"
+from nbainjuries import injury
+from datetime import datetime
 
 def get_injuries():
-    injuries = {}
+    """
+    Fetch NBA injuries for today using nbainjuries package.
+    Returns a dictionary:
+    {
+        "Boston Celtics": [
+            {"player": "Jaylen Brown", "status": "Questionable", "note": "Right Knee"},
+            ...
+        ],
+        ...
+    }
+    """
+    injuries_by_team = {}
+
+    # Use today's date, 5:00 PM ET snapshot (NBA injury report cutoff)
+    now = datetime.now()
+    snapshot_dt = datetime(year=now.year, month=now.month, day=now.day, hour=17, minute=0)
+
     try:
-        response = requests.get(SPORTSETHOS_URL, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        # Each team section
-        team_sections = soup.select("div.injury-team")
-        for team_div in team_sections:
-            team_name_tag = team_div.find("h3")
-            if not team_name_tag:
-                continue
-            team_name = team_name_tag.get_text(strip=True)
-            injuries[team_name] = []
-
-            player_rows = team_div.select("li")
-            for row in player_rows:
-                text = row.get_text(" ", strip=True)
-                parts = text.split(" — ")
-                note = parts[1] if len(parts) > 1 else ""
-                player_status = parts[0].split()
-                if len(player_status) < 3:
-                    continue
-                player_name = " ".join(player_status[:-2])
-                position = player_status[-2]
-                status = player_status[-1]
-                injuries[team_name].append({
-                    "player": player_name,
-                    "position": position,
-                    "status": status,
-                    "note": note
-                })
+        data = injury.get_reportdata(snapshot_dt)
     except Exception as e:
-        injuries["Error"] = [{"player": "", "position": "", "status": "Error", "note": str(e)}]
+        print("Error fetching injury report:", e)
+        return {}
 
-    return injuries
+    # Organize by team
+    for entry in data:
+        team = entry.get("Team")
+        player = entry.get("Player Name")
+        status = entry.get("Current Status")
+        reason = entry.get("Reason")
 
+        if team not in injuries_by_team:
+            injuries_by_team[team] = []
+
+        injuries_by_team[team].append({
+            "player": player,
+            "status": status,
+            "note": reason
+        })
+
+    return injuries_by_team
+
+# -----------------------------
 # Test locally
+# -----------------------------
 if __name__ == "__main__":
-    data = get_injuries()
-    for team, players in data.items():
-        print(team)
+    injuries = get_injuries()
+    if not injuries:
+        print("No injuries found or error occurred.")
+    for team, players in injuries.items():
+        print(f"Team: {team}")
         for p in players:
-            print(f" - {p['player']} ({p['position']}) — {p['status']}: {p['note']}")
+            print(f" - {p['player']} ({p['status']}): {p['note']}")
