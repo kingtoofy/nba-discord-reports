@@ -1,32 +1,27 @@
 name: NBA Daily Discord Reports
 
-# Run every day at 8:00 AM PST
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 16 * * *'  # 16:00 UTC = 8:00 AM PST
-  workflow_dispatch:      # Allows manual run
+    - cron: "0 16 * * *"  # 8:00 AM PST
 
 jobs:
   run:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repo
       - uses: actions/checkout@v4
 
-      # Set up Python
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # Install dependencies
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install deps
+        run: pip install requests
 
-      # Run main Python script
-      - name: Run NBA Discord Reports
+      - name: Run bot
         env:
           DISCORD_DAILY_WEBHOOK: ${{ secrets.DISCORD_DAILY_WEBHOOK }}
           DISCORD_PICKS_WEBHOOK: ${{ secrets.DISCORD_PICKS_WEBHOOK }}
+          BALLEDONTLIE_API_KEY: ${{ secrets.BALLEDONTLIE_API_KEY }}
         run: python -m src.main
