@@ -13,41 +13,19 @@ def get_injuries():
 
     injuries_by_team = {}
 
-    # ESPN uses tables for each team; we find all tables
-    tables = soup.find_all("table")
-
-    for table in tables:
-        # Team name is in previous h2 tag
-        team_tag = table.find_previous("h2")
-        if not team_tag:
+    # Each team section is in a div with data-team attribute
+    team_sections = soup.find_all("div", class_="Injury__Team")
+    for team_div in team_sections:
+        team_name_tag = team_div.find("h2")
+        if not team_name_tag:
             continue
-        team_name = team_tag.text.strip()
+        team_name = team_name_tag.text.strip()
         injuries_by_team[team_name] = []
 
-        rows = table.find("tbody").find_all("tr")
-        for row in rows:
-            cols = row.find_all("td")
-            if len(cols) < 4:
-                continue
-            player = cols[0].text.strip()
-            position = cols[1].text.strip()
-            status = cols[2].text.strip()
-            note = cols[3].text.strip()
-            injuries_by_team[team_name].append({
-                "player": player,
-                "position": position,
-                "status": status,
-                "note": note
-            })
-
-    return injuries_by_team
-
-# -------------------------
-# TEST FETCHER
-# -------------------------
-if __name__ == "__main__":
-    injuries = get_injuries()
-    for team, players in injuries.items():
-        print(f"{team}:")
-        for p in players:
-            print(f"  {p['player']} ({p['position']}) — {p['status']}")
+        # Players are in divs with class 'Injury__Player'
+        player_divs = team_div.find_all("div", class_="Injury__Player")
+        for p_div in player_divs:
+            player_name_tag = p_div.find("span", class_="Injury__PlayerName")
+            position_tag = p_div.find("span", class_="Injury__PlayerPosition")
+            status_tag = p_div.find("span", class_="Injury__PlayerStatus")
+            note_tag = p_div.find("span", class_="Inj_
