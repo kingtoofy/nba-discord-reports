@@ -2,7 +2,7 @@
 
 import os
 import requests
-from report_writer import daily_report, picks_report
+from src.report_writer import daily_report, picks_report
 
 # -----------------------------
 # Discord webhook URLs
