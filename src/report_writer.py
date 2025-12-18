@@ -2,12 +2,12 @@
 
 import requests
 from bs4 import BeautifulSoup
+from src.fetch_injuries import get_injuries
 
 # -----------------------------
 # Configuration
 # -----------------------------
 SCHEDULE_URL = "https://www.espn.com/nba/schedule"
-SPORTSETHOS_URL = "https://sportsethos.com/live-injury-report/"
 
 # -----------------------------
 # Fetch today's NBA schedule
@@ -30,46 +30,6 @@ def get_schedule():
     except Exception as e:
         schedule.append(f"Failed to fetch schedule: {e}")
     return schedule
-
-# -----------------------------
-# Fetch today's NBA injuries from Sportsethos
-# -----------------------------
-def get_injuries():
-    injuries = {}
-    try:
-        response = requests.get(SPORTSETHOS_URL, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
-        
-        # Each team section is a div with class 'injury-team'
-        team_sections = soup.select("div.injury-team")
-        for team_div in team_sections:
-            team_name_tag = team_div.find("h3")
-            if not team_name_tag:
-                continue
-            team_name = team_name_tag.get_text(strip=True)
-            injuries[team_name] = []
-
-            player_rows = team_div.select("li")
-            for row in player_rows:
-                text = row.get_text(" ", strip=True)
-                parts = text.split(" — ")
-                note = parts[1] if len(parts) > 1 else ""
-                player_status = parts[0].split()
-                if len(player_status) < 3:
-                    continue
-                player_name = " ".join(player_status[:-2])
-                position = player_status[-2]
-                status = player_status[-1]
-                injuries[team_name].append({
-                    "player": player_name,
-                    "position": position,
-                    "status": status,
-                    "note": note
-                })
-    except Exception as e:
-        injuries["Error"] = [{"player": "", "position": "", "status": "Error", "note": str(e)}]
-
-    return injuries
 
 # -----------------------------
 # Generate the daily Discord report
@@ -100,11 +60,10 @@ def daily_report():
 
 # -----------------------------
 # Generate the top picks report
-# (dummy example, can replace with real prop logic)
+# (dummy example, replace with real prop logic)
 # -----------------------------
 def picks_report():
     report = "🏀 **NBA Top Picks of the Day** 🏀\n\n"
-    # Replace the example picks with your real analysis
     top_picks = [
         {"player": "Trae Young", "pick": "Over 28.5 P+R+A", "confidence": "92%"},
         {"player": "Jayson Tatum", "pick": "Under 30.5 P+R+A", "confidence": "88%"},
