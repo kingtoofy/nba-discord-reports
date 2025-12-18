@@ -1,32 +1,27 @@
 # src/report_writer.py
 
 import requests
-from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import date, datetime
 from src.fetch_injuries import get_injuries
 
-SCHEDULE_URL = "https://www.espn.com/nba/schedule"
+BALLEDONTLIE_GAMES_URL = "https://api.balldontlie.io/v1/games"
 
 def get_schedule():
     """
-    Fetch today's NBA schedule from ESPN.
+    Fetch today's NBA schedule using balldontlie API.
     Returns a list of matchups like ["LAL vs BOS", ...]
     """
     schedule = []
-    try:
-        response = requests.get(SCHEDULE_URL, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
+    today = date.today().isoformat()
+    params = {"dates[]": today}
 
-        # Find the main table with today's games
-        schedule_table = soup.find("table", class_="Table")
-        if schedule_table:
-            rows = schedule_table.find_all("tr")[1:]  # skip header
-            for row in rows:
-                cells = row.find_all("td")
-                if len(cells) >= 2:
-                    team1 = cells[0].get_text(strip=True)
-                    team2 = cells[1].get_text(strip=True)
-                    schedule.append(f"{team1} vs {team2}")
+    try:
+        response = requests.get(BALLEDONTLIE_GAMES_URL, params=params, timeout=10)
+        data = response.json().get("data", [])
+        for g in data:
+            home = g["home_team"]["full_name"]
+            away = g["visitor_team"]["full_name"]
+            schedule.append(f"{away} vs {home}")
     except Exception as e:
         schedule.append(f"Failed to fetch schedule: {e}")
 
