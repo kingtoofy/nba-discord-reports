@@ -1,6 +1,11 @@
 from datetime import date
+from src.fetch_schedule import get_todays_games
 
 def picks_report():
+    """
+    Placeholder picks report. 
+    Will be replaced later with real statistical picks.
+    """
     today = date.today().strftime("%B %d, %Y")
     return f"""
 🏀 **Top NBA Picks — {today}**
@@ -14,8 +19,14 @@ def picks_report():
 
 def daily_report():
     today = date.today().strftime("%B %d, %Y")
-    return f"""
-🏀 **NBA Daily Report — {today}**
+    games = get_todays_games()
 
-Games will appear here once data is wired.
-"""
+    if not games:
+        return f"🏀 **NBA Daily Report — {today}**\n\nNo games today."
+
+    report = f"🏀 **NBA Daily Report — {today}**\n\n"
+
+    for game in games:
+        report += f"• {game}\n"
+
+    return report
