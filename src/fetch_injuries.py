@@ -27,5 +27,3 @@ def get_injuries():
         for p_div in player_divs:
             player_name_tag = p_div.find("span", class_="Injury__PlayerName")
             position_tag = p_div.find("span", class_="Injury__PlayerPosition")
-            status_tag = p_div.find("span", class_="Injury__PlayerStatus")
-            note_tag = p_div.find("s
